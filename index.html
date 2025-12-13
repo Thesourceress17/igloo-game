@@ -5,25 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מעצבים את האיגלו</title>
     
-    <!-- טעינת ספריות חיצוניות (React, Tailwind) -->
+    <!-- טעינת ספריות ופונטים -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
     
     <style>
-        /* מניעת גלילה מיותרת במובייל */
-        body { overscroll-behavior: none; }
+        body { 
+            overscroll-behavior: none; 
+            font-family: 'Varela Round', sans-serif;
+        }
+        /* טריק למיזוג תמונות עם רקע לבן לתוך השלג */
+        .blend-snow {
+            mix-blend-mode: multiply;
+        }
     </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-100">
 
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useRef } = React;
 
-        // === הגדרות קבצים ===
+        // הגדרת קבצים
         const BACKGROUND_IMAGE = 'bg.jpg'; 
 
         const FURNITURE = [
@@ -31,8 +38,8 @@
           { id: 'coffee-table',  label: 'שולחן קפה',    src: 'coffee-table.png',  width: 18 },
           { id: 'walking-steps', label: 'מדרגות',       src: 'walking-steps.png', width: 25 },
           { id: 'shelf_crate',   label: 'מדף וארגז',    src: 'shelf_crate.png',   width: 20 },
-          { id: 'ice-bar',       label: 'בר קרח',       src: 'ice-bar.png',       width: 28 },
-          { id: 'fire-place',    label: 'אח',           src: 'fire-place.jpg',    width: 15 },
+          { id: 'ice_bar',       label: 'בר קרח',       src: 'ice-bar.png',       width: 28 },
+          { id: 'fire-place',    label: 'אח מחמם',      src: 'fire-place.jpg',    width: 15 },
           { id: 'wooden_table',  label: 'שולחן עץ',     src: 'wooden_table.png',  width: 22 },
           { id: 'innuits',       label: 'אסקימוסים',    src: 'innuits.jpg',       width: 20 },
         ];
@@ -40,6 +47,7 @@
         function App() {
           const [items, setItems] = useState([]);
           const [dragInfo, setDragInfo] = useState(null);
+          const [blendMode, setBlendMode] = useState(true); // מצב שילוב מופעל כברירת מחדל
           const containerRef = useRef(null);
 
           // הוספת פריט
@@ -51,7 +59,7 @@
             }]);
           };
 
-          // גרירה
+          // ניהול גרירה
           const handleDragStart = (e, uid) => {
             e.stopPropagation();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -67,7 +75,6 @@
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             const rect = containerRef.current.getBoundingClientRect();
 
-            // חישוב מיקום באחוזים
             const x = ((clientX - rect.left) / rect.width) * 100;
             const y = ((clientY - rect.top) / rect.height) * 100;
 
@@ -78,11 +85,8 @@
             ));
           };
 
-          const handleDragEnd = () => {
-             setDragInfo(null);
-          };
+          const handleDragEnd = () => setDragInfo(null);
 
-          // סיבוב בלחיצה כפולה
           const handleDoubleClick = (uid) => {
             setItems(prev => prev.map(item => 
               item.uid === uid ? { ...item, rotation: (item.rotation + 45) % 360 } : item
@@ -91,48 +95,63 @@
 
           return (
             <div 
-              className="flex flex-col h-screen overflow-hidden select-none touch-none"
+              className="flex flex-col h-screen overflow-hidden select-none touch-none bg-slate-50"
               onPointerMove={handleDragMove}
               onPointerUp={handleDragEnd}
               onPointerLeave={handleDragEnd}
               onTouchMove={handleDragMove}
               onTouchEnd={handleDragEnd}
             >
-              {/* כותרת */}
-              <header className="bg-white p-3 shadow-sm z-10 flex justify-between px-6 items-center border-b">
-                <h1 className="font-bold text-slate-700 text-lg">❄️ עיצוב האיגלו</h1>
-                <button 
-                  onClick={() => setItems([])}
-                  className="text-sm text-red-600 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-full transition font-bold border border-red-200"
-                >
-                  🔄 נקה הכל
-                </button>
+              {/* כותרת מעוצבת */}
+              <header className="bg-white/80 backdrop-blur-md p-3 shadow-sm z-20 flex justify-between px-6 items-center border-b border-slate-200">
+                <div className="flex items-center gap-2">
+                    <span className="text-2xl">❄️</span>
+                    <h1 className="font-bold text-slate-700 text-xl tracking-tight">עיצוב האיגלו</h1>
+                </div>
+                
+                <div className="flex gap-3">
+                    {/* כפתור החלפת מצב שילוב */}
+                    <button 
+                      onClick={() => setBlendMode(!blendMode)}
+                      className={`text-xs px-3 py-1.5 rounded-full transition font-bold border flex items-center gap-1 ${blendMode ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}
+                      title="מסתיר רקע לבן של תמונות"
+                    >
+                      {blendMode ? '✨ מיזוג שלג פעיל' : '🌑 מצב רגיל'}
+                    </button>
+
+                    <button 
+                      onClick={() => setItems([])}
+                      className="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition font-bold border border-red-200 flex items-center gap-1"
+                    >
+                      🗑️ נקה הכל
+                    </button>
+                </div>
               </header>
 
               <div className="flex flex-1 overflow-hidden">
-                {/* סרגל צד */}
-                <aside className="w-28 bg-white border-l p-2 flex flex-col gap-3 overflow-y-auto z-10 shadow-lg">
-                  <div className="text-center text-xs text-slate-400 font-bold mb-1">לחצו להוספה</div>
+                {/* סרגל צד מעוצב */}
+                <aside className="w-32 bg-white border-l border-slate-100 p-2 flex flex-col gap-3 overflow-y-auto z-10 shadow-xl">
+                  <div className="text-center text-xs text-slate-400 font-bold mt-2 mb-1">בחרו רהיטים</div>
                   {FURNITURE.map(item => (
                     <button
                       key={item.id}
                       onClick={() => addItem(item)}
-                      className="relative p-1 rounded-lg border border-slate-100 hover:border-blue-400 hover:bg-blue-50 transition group flex flex-col items-center shadow-sm"
+                      className="relative p-2 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-300 hover:bg-blue-50 hover:shadow-md transition-all group flex flex-col items-center"
                     >
                       <img 
                         src={item.src} 
                         alt={item.label}
-                        className="w-full h-14 object-contain pointer-events-none"
+                        className={`w-full h-16 object-contain pointer-events-none transition-transform group-hover:scale-105 ${blendMode ? 'blend-snow' : ''}`}
                         onError={(e) => {
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
                         }}
                       />
                       {/* Fallback */}
-                      <div className="hidden w-full h-14 items-center justify-center bg-slate-100 text-[10px] text-slate-400 text-center p-1 leading-tight">
-                        אין תמונה<br/>{item.src}
+                      <div className="hidden w-full h-16 items-center justify-center bg-slate-100 text-[9px] text-red-400 text-center p-1 leading-tight rounded">
+                        שגיאה בטעינה<br/>{item.src}
                       </div>
-                      <span className="text-[11px] text-slate-700 mt-1 text-center font-bold leading-tight w-full">
+                      <span className="text-[11px] text-slate-600 mt-2 text-center font-bold leading-tight w-full">
                         {item.label}
                       </span>
                     </button>
@@ -140,10 +159,10 @@
                 </aside>
 
                 {/* משטח עבודה */}
-                <main className="flex-1 bg-slate-200 flex items-center justify-center p-2 md:p-8 relative">
+                <main className="flex-1 bg-slate-200/50 flex items-center justify-center p-2 md:p-6 relative">
                   <div 
                     ref={containerRef}
-                    className="relative w-full max-w-6xl aspect-video bg-white shadow-2xl overflow-hidden rounded-xl border-4 border-white"
+                    className="relative w-full max-w-6xl aspect-video bg-white shadow-2xl overflow-hidden rounded-2xl border-4 border-white ring-1 ring-slate-200"
                   >
                     {/* תמונת רקע */}
                     <img 
@@ -174,16 +193,17 @@
                         {/* כפתור מחיקה */}
                         <button 
                           onPointerDown={(e) => { e.stopPropagation(); setItems(prev => prev.filter(i => i.uid !== item.uid)); }}
-                          className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-lg z-50 hover:scale-110 font-bold text-xs border-2 border-white"
+                          className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-lg z-50 hover:scale-110 font-bold text-[10px] border border-white"
                         >
-                          X
+                          ✕
                         </button>
 
                         <img 
                           src={item.src} 
                           alt={item.label}
                           draggable={false}
-                          className="w-full h-auto drop-shadow-2xl select-none"
+                          /* הוספנו כאן את ה-blend-snow כדי למזג את הלבן */
+                          className={`w-full h-auto select-none transition-all ${blendMode ? 'blend-snow opacity-90' : 'drop-shadow-xl'}`}
                           onError={(e) => {
                              e.target.style.display = 'none';
                              e.target.nextSibling.style.display = 'flex';
@@ -191,8 +211,8 @@
                         />
                         
                         {/* Fallback לפריט על המסך */}
-                        <div className="hidden w-24 h-24 bg-white/80 border-2 border-dashed border-red-400 rounded-lg flex-col items-center justify-center text-center p-1 backdrop-blur-sm shadow-xl">
-                           <span className="text-2xl">🖼️</span>
+                        <div className="hidden w-20 h-20 bg-white/60 border-2 border-dashed border-red-300 rounded-lg flex-col items-center justify-center text-center p-1 backdrop-blur-sm shadow-sm">
+                           <span className="text-xl">⚠️</span>
                            <span className="text-[10px] font-bold text-slate-700 mt-1">{item.label}</span>
                         </div>
                       </div>
