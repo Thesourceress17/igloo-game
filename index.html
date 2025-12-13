@@ -17,9 +17,16 @@
             overscroll-behavior: none; 
             font-family: 'Varela Round', sans-serif;
         }
-        /* מחלקת העזר למיזוג - מופעלת רק כשהכפתור דלוק */
+        
+        /* מחלקת העזר למיזוג - משופרת */
         .blend-snow {
+            /* מיזוג כהה - מעלים לבן */
             mix-blend-mode: multiply;
+            /* הגברת בהירות כדי שהלבן של התמונה יהיה שקוף לגמרי */
+            filter: brightness(1.05) contrast(1.1);
+            /* מסכה שמעלימה את הקצוות המרובעים */
+            -webkit-mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
+            mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
         }
     </style>
 </head>
@@ -48,7 +55,7 @@
         function App() {
           const [items, setItems] = useState([]);
           const [dragInfo, setDragInfo] = useState(null);
-          // החזרתי ל-true: המצב השקוף (מיזוג) מופעל כברירת מחדל
+          // מצב מיזוג פעיל כברירת מחדל
           const [blendMode, setBlendMode] = useState(true); 
           const containerRef = useRef(null);
 
@@ -143,6 +150,7 @@
                       <img 
                         src={item.src} 
                         alt={item.label}
+                        /* שינוי: הסרתי את opacity-90 כדי שהתמונה תהיה ברורה יותר כשיש מסכה */
                         className={`w-full h-16 object-contain pointer-events-none transition-transform group-hover:scale-105 ${blendMode ? 'blend-snow' : ''}`}
                         onError={(e) => {
                           e.target.style.display = 'none';
@@ -204,7 +212,8 @@
                           src={item.src} 
                           alt={item.label}
                           draggable={false}
-                          className={`w-full h-auto select-none transition-all ${blendMode ? 'blend-snow opacity-90' : 'drop-shadow-xl'}`}
+                          /* תיקון: הסרת השקיפות, הוספת ה-Class המעודכן */
+                          className={`w-full h-auto select-none transition-all ${blendMode ? 'blend-snow' : 'drop-shadow-xl'}`}
                           onError={(e) => {
                              e.target.style.display = 'none';
                              e.target.nextSibling.style.display = 'flex';
