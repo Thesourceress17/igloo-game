@@ -17,7 +17,7 @@
             overscroll-behavior: none; 
             font-family: 'Varela Round', sans-serif;
         }
-        /* טריק למיזוג תמונות עם רקע לבן לתוך השלג */
+        /* מחלקת העזר למיזוג - מופעלת רק כשהכפתור דלוק */
         .blend-snow {
             mix-blend-mode: multiply;
         }
@@ -30,15 +30,16 @@
     <script type="text/babel">
         const { useState, useRef } = React;
 
-        // הגדרת קבצים
+        // === חשוב: ודאי ששם קובץ הרקע בתיקייה הוא בדיוק bg.jpg ===
         const BACKGROUND_IMAGE = 'bg.jpg'; 
 
+        // רשימת הרהיטים המעודכנת לפי הקבצים שלך
         const FURNITURE = [
           { id: 'fur-bed',       label: 'מיטת פרווה',   src: 'fur-bed.png',       width: 25 },
           { id: 'coffee-table',  label: 'שולחן קפה',    src: 'coffee-table.png',  width: 18 },
           { id: 'walking-steps', label: 'מדרגות',       src: 'walking-steps.png', width: 25 },
           { id: 'shelf_crate',   label: 'מדף וארגז',    src: 'shelf_crate.png',   width: 20 },
-          { id: 'ice_bar',       label: 'בר קרח',       src: 'ice-bar.png',       width: 28 },
+          { id: 'ice_bar',       label: 'בר קרח',       src: 'ice_bar.png',       width: 28 },
           { id: 'fire-place',    label: 'אח מחמם',      src: 'fire-place.jpg',    width: 15 },
           { id: 'wooden_table',  label: 'שולחן עץ',     src: 'wooden_table.png',  width: 22 },
           { id: 'innuits',       label: 'אסקימוסים',    src: 'innuits.jpg',       width: 20 },
@@ -47,7 +48,8 @@
         function App() {
           const [items, setItems] = useState([]);
           const [dragInfo, setDragInfo] = useState(null);
-          const [blendMode, setBlendMode] = useState(true); // מצב שילוב מופעל כברירת מחדל
+          // החזרתי ל-true: המצב השקוף (מיזוג) מופעל כברירת מחדל
+          const [blendMode, setBlendMode] = useState(true); 
           const containerRef = useRef(null);
 
           // הוספת פריט
@@ -202,7 +204,6 @@
                           src={item.src} 
                           alt={item.label}
                           draggable={false}
-                          /* הוספנו כאן את ה-blend-snow כדי למזג את הלבן */
                           className={`w-full h-auto select-none transition-all ${blendMode ? 'blend-snow opacity-90' : 'drop-shadow-xl'}`}
                           onError={(e) => {
                              e.target.style.display = 'none';
