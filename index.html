@@ -83,9 +83,6 @@
         const Icon = ({ name, size = 20, className }) => {
             if (window.lucide && window.lucide.icons[name]) {
                 const IconComponent = window.lucide.icons[name];
-                // משתמשים ב-createElement כי אנחנו ב-React
-                // אבל הדרך הפשוטה עם lucide-react לא זמינה כאן בקלות בלי בילד.
-                // אז נשתמש באייקונים בסיסיים של טקסט/SVG אם הספרייה לא נטענה, או נסמוך על ה-CDN.
                 return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
             }
             return <span>•</span>;
@@ -209,7 +206,7 @@
             >
               {/* === כותרת עליונה === */}
               {screen !== 'photo' && (
-                <header className="bg-white px-4 py-3 shadow-sm z-20 flex justify-between items-center">
+                <header className="bg-white px-4 py-3 shadow-sm z-20 flex justify-between items-center" onClick={(e) => e.stopPropagation()}>
                     <button onClick={() => setScreen('start')} className="p-2 rounded-full hover:bg-slate-100">
                         <Icon name="arrow-right" className="text-slate-600 rotate-180" />
                     </button>
@@ -261,6 +258,7 @@
                       <div
                         key={item.uid}
                         onPointerDown={(e) => handlePointerDown(e, item.uid)}
+                        onClick={(e) => e.stopPropagation()} // תיקון: מונע ביטול בחירה מידי
                         className={`absolute flex flex-col items-center group touch-none origin-center
                            ${screen !== 'photo' ? 'cursor-move' : ''}
                         `}
@@ -296,7 +294,10 @@
 
               {/* === סרגל שליטה וכלים (תחתון) === */}
               {screen === 'game' && (
-                  <footer className="bg-white border-t border-slate-200 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] transition-all duration-300">
+                  <footer 
+                    className="bg-white border-t border-slate-200 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] transition-all duration-300"
+                    onClick={(e) => e.stopPropagation()} // תיקון: מונע ביטול בחירה בלחיצה על הסרגל
+                  >
                       
                       {/* מצב 1: פריט נבחר - מציג כלי עריכה */}
                       {selectedItem ? (
